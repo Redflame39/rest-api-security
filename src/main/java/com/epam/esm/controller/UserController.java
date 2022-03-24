@@ -77,20 +77,6 @@ public class UserController {
         return dto;
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserDto create(@RequestBody UpdatingUserDto user) {
-        UserDto dto = userService.create(user);
-        Link self = linkTo(methodOn(UserController.class)
-                .create(user))
-                .withSelfRel();
-        Link toCreatedLink = linkTo(methodOn(UserController.class)
-                .read(dto.getId()))
-                .withRel("Read created");
-        dto.add(self, toCreatedLink);
-        return dto;
-    }
-
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto update(@PathVariable Long id, @RequestBody UpdatingUserDto user) {

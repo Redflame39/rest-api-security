@@ -30,6 +30,14 @@ public interface UserRepository<K> {
     Optional<User> findById(K id);
 
     /**
+     * Find user by username.
+     *
+     * @param username the username
+     * @return the optional
+     */
+    Optional<User> findByUsername(String username);
+
+    /**
      * Create user.
      *
      * @param user the user

@@ -1,5 +1,6 @@
 package com.epam.esm.service.api;
 
+import com.epam.esm.model.dto.AuthenticatingDto;
 import com.epam.esm.model.dto.UpdatingUserDto;
 import com.epam.esm.model.dto.UserDto;
 
@@ -33,7 +34,7 @@ public interface UserService {
      * @param userDto the user dto with creating attributes
      * @return the created user dto
      */
-    UserDto create(UpdatingUserDto userDto);
+    UserDto create(AuthenticatingDto userDto);
 
     /**
      * Update user by id with given in {@code UpdatingUserDto} attributes.

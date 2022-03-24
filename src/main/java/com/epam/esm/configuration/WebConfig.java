@@ -11,6 +11,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -26,7 +28,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Configuration
-@ComponentScan("com.epam.esm")
 @PropertySource("classpath:db/config.properties")
 @EnableTransactionManagement
 public class WebConfig implements WebMvcConfigurer {
@@ -95,9 +96,15 @@ public class WebConfig implements WebMvcConfigurer {
         converters.add(new UserToUserDtoConverter());
         converters.add(new UpdatingUserDtoToUserConverter());
         converters.add(new OrderToOrderDtoConverter());
+        converters.add(new AuthenticatingUserDtoToUserConverter());
         conversionServiceFactoryBean.setConverters(converters);
         conversionServiceFactoryBean.afterPropertiesSet();
         return conversionServiceFactoryBean;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Override

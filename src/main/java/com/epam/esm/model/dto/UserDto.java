@@ -18,12 +18,6 @@ public class UserDto extends RepresentationModel<UserDto> {
 
     String email;
 
-    String password;
-
-    String firstName;
-
-    String lastName;
-
     String createDate;
 
     String lastUpdateDate;

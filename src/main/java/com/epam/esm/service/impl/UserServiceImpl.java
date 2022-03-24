@@ -1,24 +1,33 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.model.dto.AuthenticatingDto;
 import com.epam.esm.model.dto.UpdatingUserDto;
 import com.epam.esm.model.dto.UserDto;
+import com.epam.esm.model.entity.Role;
 import com.epam.esm.model.entity.User;
 import com.epam.esm.repository.api.UserRepository;
 import com.epam.esm.service.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final ConversionService conversionService;
     private final UserRepository<Long> userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserDto> findAll(Integer pageNum, Integer pageSize) {
@@ -34,8 +43,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(UpdatingUserDto userDto) {
+    public UserDto create(AuthenticatingDto userDto) {
         User user = conversionService.convert(userDto, User.class);
+        Role role = new Role();
+        role.setName("ROLE_USER");
+        user.setRole(role);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User created = userRepository.create(user);
         return conversionService.convert(created, UserDto.class);
     }
@@ -57,4 +70,11 @@ public class UserServiceImpl implements UserService {
     public Long countUsers() {
         return userRepository.countUsers();
     }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByUsername(username);
+        return user.orElseThrow(() -> new UsernameNotFoundException("Requested user not found, username: " + username));
+    }
+
 }

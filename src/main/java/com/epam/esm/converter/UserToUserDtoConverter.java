@@ -16,10 +16,6 @@ public class UserToUserDtoConverter implements Converter<User, UserDto> {
         UserDto userDto = new UserDto();
         userDto.setId(source.getId());
         userDto.setEmail(source.getEmail());
-        userDto.setPassword(source.getPassword());
-        userDto.setFirstName(source.getFirstName());
-        userDto.setLastName(source.getLastName());
-
         LocalDateTime createLocalDateTime = source.getCreateDate().toLocalDateTime();
         LocalDateTime updateLocalDateTime = source.getLastUpdateDate().toLocalDateTime();
         String createDate = createLocalDateTime.format(FORMATTER);

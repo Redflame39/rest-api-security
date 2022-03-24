@@ -6,8 +6,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +37,21 @@ public class UserRepositoryImpl implements UserRepository<Long> {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
+        Root<User> root = criteriaQuery.from(User.class);
+        Predicate usernamePredicate = criteriaBuilder.equal(root.get("email"), username);
+        criteriaQuery.select(root).where(usernamePredicate);
+        TypedQuery<User> typedQuery = entityManager.createQuery(criteriaQuery);
+        try {
+            return Optional.of(typedQuery.getSingleResult());
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     @Transactional
     public User create(User user) {
         entityManager.persist(user);
@@ -45,8 +65,6 @@ public class UserRepositoryImpl implements UserRepository<Long> {
         entityManager.detach(user);
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
         entityManager.merge(user);
         return user;
     }

@@ -18,7 +18,7 @@ public interface UserService {
      * @param pageSize the size of page
      * @return list of users found
      */
-    List<UserDto> findAll(Integer pageNum, Integer pageSize);
+    List<UserDto> findAll(Long pageNum, Long pageSize);
 
     /**
      * Find by user by id.

@@ -29,7 +29,7 @@ public interface CertificateService {
      * @param pageSize             count of certificates on the page
      * @return list of {@code CertificateDto}
      */
-    List<CertificateDto> findAll(CertificateQueryDto certificatesQueryDto, Integer pageNum, Integer pageSize);
+    List<CertificateDto> findAll(CertificateQueryDto certificatesQueryDto, Long pageNum, Long pageSize);
 
     /**
      * Finds certificate by given id.

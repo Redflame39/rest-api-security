@@ -26,7 +26,7 @@ public interface TagService {
      * @param pageSize the size of page
      * @return list of tags found
      */
-    List<TagDto> findAll(Integer pageNum, Integer pageSize);
+    List<TagDto> findAll(Long pageNum, Long pageSize);
 
     /**
      * Find all tags of certificate by its id.

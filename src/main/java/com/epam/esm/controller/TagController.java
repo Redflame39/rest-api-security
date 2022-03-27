@@ -25,15 +25,18 @@ public class TagController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public CollectionModel<TagDto> read(@RequestParam(name = "page", required = false, defaultValue = "1")
-                                        @Min(value = 1, message = "Page should be represented as positive number")
-                                                Integer pageNum,
+    public CollectionModel<TagDto> read(@RequestParam(name = "page", required = false, defaultValue = "0")
+                                        @Min(value = 0, message = "Page size should be greater than or equal to zero")
+                                                Long pageNum,
                                         @RequestParam(name = "pageSize", required = false, defaultValue = "50")
                                         @Min(value = 1, message = "Page size should be represented as positive number")
                                         @Max(value = 100, message = "Page size should not be greater than 100")
-                                                Integer pageSize) {
-        List<TagDto> tagDtos = service.findAll(pageNum, pageSize);
+                                                Long pageSize) {
         Long tagsCount = service.countTags();
+        pageSize = pageSize >= tagsCount
+                ? tagsCount
+                : pageSize;
+        List<TagDto> tagDtos = service.findAll(pageNum, pageSize);
         for (TagDto dto : tagDtos) {
             Link self = linkTo(methodOn(TagController.class)
                     .read(dto.getId()))
@@ -41,7 +44,7 @@ public class TagController {
             dto.add(self);
         }
         List<Link> collectionLinks = new ArrayList<>();
-        if (pageNum != 1) {
+        if (pageNum != 0) {
             Link prevPageLink = linkTo(methodOn(TagController.class)
                     .read(pageNum - 1, pageSize))
                     .withRel("Previous page");
@@ -50,7 +53,7 @@ public class TagController {
         Link currentPageLink = linkTo(methodOn(TagController.class)
                 .read(pageNum, pageSize))
                 .withRel("Current page");
-        boolean isLastPage = (long) pageNum * pageSize >= tagsCount;
+        boolean isLastPage = pageNum * pageSize >= tagsCount;
         if (!isLastPage) {
             Link nextPageLink = linkTo(methodOn(TagController.class)
                     .read(pageNum + 1, pageSize))

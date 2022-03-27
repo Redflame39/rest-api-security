@@ -8,6 +8,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -30,6 +31,7 @@ import java.util.Set;
 @Configuration
 @PropertySource("classpath:db/config.properties")
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackages = "com.epam.esm.repository")
 public class WebConfig implements WebMvcConfigurer {
 
     private final String PROPERTY_MESSAGE = "property/messages";

@@ -6,25 +6,25 @@ import com.epam.esm.model.dto.OrderDto;
 import com.epam.esm.model.entity.Certificate;
 import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.User;
-import com.epam.esm.repository.api.CertificateRepository;
-import com.epam.esm.repository.api.OrderRepository;
-import com.epam.esm.repository.api.UserRepository;
+import com.epam.esm.repository.CertificateRepository;
+import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.api.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-@Component
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OrderServiceImpl implements OrderService {
 
-    private final OrderRepository<Long> orderRepository;
-    private final UserRepository<Long> userRepository;
-    private final CertificateRepository<Long> certificateRepository;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final CertificateRepository certificateRepository;
     private final ConversionService conversionService;
 
     @Override
@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCertificates(orderedCertificates);
         Double price = calculatePrice(orderedCertificates);
         order.setPrice(price);
-        Order newOrder = orderRepository.create(order);
+        Order newOrder = orderRepository.save(order);
         return conversionService.convert(newOrder, OrderDto.class);
     }
 
@@ -77,4 +77,5 @@ public class OrderServiceImpl implements OrderService {
                 .mapToDouble(Certificate::getPrice)
                 .sum();
     }
+
 }

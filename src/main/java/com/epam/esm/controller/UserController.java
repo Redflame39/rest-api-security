@@ -30,15 +30,18 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public CollectionModel<UserDto> read(@RequestParam(name = "page", required = false, defaultValue = "1")
-                                         @Min(value = 1, message = "Page should be represented as positive number")
-                                                 Integer pageNum,
+    public CollectionModel<UserDto> read(@RequestParam(name = "page", required = false, defaultValue = "0")
+                                         @Min(value = 0, message = "Page size should be greater than or equal to zero")
+                                                 Long pageNum,
                                          @RequestParam(name = "pageSize", required = false, defaultValue = "50")
                                          @Min(value = 1, message = "Page size should be represented as positive number")
                                          @Max(value = 100, message = "Page size should not be greater than 100")
-                                                 Integer pageSize) {
-        List<UserDto> userDtos = userService.findAll(pageNum, pageSize);
+                                                 Long pageSize) {
         Long usersCount = userService.countUsers();
+        pageSize = pageSize >= usersCount
+                ? usersCount
+                : pageSize;
+        List<UserDto> userDtos = userService.findAll(pageNum, pageSize);
         for (UserDto dto : userDtos) {
             Link certificateLink = linkTo(methodOn(CertificateController.class)
                     .read(dto.getId()))
@@ -46,7 +49,7 @@ public class UserController {
             dto.add(certificateLink);
         }
         List<Link> collectionLinks = new ArrayList<>();
-        if (pageNum != 1) {
+        if (pageNum != 0) {
             Link prevPageLink = linkTo(methodOn(UserController.class)
                     .read(pageNum - 1, pageSize))
                     .withRel("Previous page");
@@ -55,7 +58,7 @@ public class UserController {
         Link currentPageLink = linkTo(methodOn(UserController.class)
                 .read(pageNum, pageSize))
                 .withRel("Current page");
-        boolean isLastPage = (long) pageNum * pageSize >= usersCount;
+        boolean isLastPage = pageNum * pageSize >= usersCount;
         if (!isLastPage) {
             Link nextPageLink = linkTo(methodOn(UserController.class)
                     .read(pageNum + 1, pageSize))

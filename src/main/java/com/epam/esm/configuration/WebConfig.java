@@ -1,8 +1,10 @@
 package com.epam.esm.configuration;
 
+import com.epam.esm.controller.filter.UsersOrdersAccessFilter;
 import com.epam.esm.converter.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ConversionServiceFactoryBean;
@@ -107,6 +109,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public FilterRegistrationBean<UsersOrdersAccessFilter> loggingFilter() {
+        FilterRegistrationBean<UsersOrdersAccessFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new UsersOrdersAccessFilter());
+        registrationBean.addUrlPatterns("/users/*");
+
+        return registrationBean;
     }
 
     @Override

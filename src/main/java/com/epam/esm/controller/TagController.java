@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.hateoas.api.TagControllerHateoasLinkBuilder;
 import com.epam.esm.model.dto.TagDto;
 import com.epam.esm.service.api.TagService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class TagController {
 
     private final TagService service;
+    private final TagControllerHateoasLinkBuilder linkBuilder;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -33,68 +35,28 @@ public class TagController {
                                         @Max(value = 100, message = "Page size should not be greater than 100")
                                                 Long pageSize) {
         Long tagsCount = service.countTags();
-        pageSize = pageSize >= tagsCount
-                ? tagsCount
-                : pageSize;
         List<TagDto> tagDtos = service.findAll(pageNum, pageSize);
-        for (TagDto dto : tagDtos) {
-            Link self = linkTo(methodOn(TagController.class)
-                    .read(dto.getId()))
-                    .withSelfRel();
-            dto.add(self);
-        }
-        List<Link> collectionLinks = new ArrayList<>();
-        if (pageNum != 0) {
-            Link prevPageLink = linkTo(methodOn(TagController.class)
-                    .read(pageNum - 1, pageSize))
-                    .withRel("Previous page");
-            collectionLinks.add(prevPageLink);
-        }
-        Link currentPageLink = linkTo(methodOn(TagController.class)
-                .read(pageNum, pageSize))
-                .withRel("Current page");
-        boolean isLastPage = pageNum * pageSize >= tagsCount;
-        if (!isLastPage) {
-            Link nextPageLink = linkTo(methodOn(TagController.class)
-                    .read(pageNum + 1, pageSize))
-                    .withRel("Next page");
-            collectionLinks.add(nextPageLink);
-        }
-        collectionLinks.add(currentPageLink);
-        return CollectionModel.of(tagDtos, collectionLinks);
+        return linkBuilder.buildReadAllLinks(tagDtos, tagsCount, pageNum, pageSize);
     }
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TagDto read(@PathVariable Long id) {
         TagDto dto = service.findById(id);
-        Link self = linkTo(methodOn(TagController.class)
-                .read(id))
-                .withSelfRel();
-        dto.add(self);
-        return dto;
+        return linkBuilder.buildReadSingleLinks(dto);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TagDto create(@RequestBody TagDto tag) {
         TagDto dto = service.create(tag);
-        Link self = linkTo(methodOn(TagController.class).create(tag)).withSelfRel();
-        Link toCreatedLink = linkTo(methodOn(TagController.class)
-                .read(dto.getId()))
-                .withRel("Read created");
-        dto.add(self, toCreatedLink);
-        return dto;
+        return linkBuilder.buildCreateLinks(dto);
     }
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TagDto delete(@PathVariable Long id) {
         TagDto dto = service.delete(id);
-        Link self = linkTo(methodOn(TagController.class)
-                .delete(id))
-                .withSelfRel();
-        dto.add(self);
-        return dto;
+        return linkBuilder.buildDeleteLinks(dto);
     }
 }

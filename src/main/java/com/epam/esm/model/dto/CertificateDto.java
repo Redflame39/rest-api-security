@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class CertificateDto extends RepresentationModel<CertificateDto> {
 
     List<TagDto> tags;
 
-    public static List<CertificateDto> toCertificateDtoList(List<Certificate> certificates) {
+    public static List<CertificateDto> toCertificateDtoList(Collection<Certificate> certificates) {
         CertificateToCertificateDtoConverter converter = new CertificateToCertificateDtoConverter();
         return certificates.stream()
                 .map(converter::convert)

@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -21,7 +22,7 @@ public class TagDto extends RepresentationModel<TagDto> {
 
     String name;
 
-    public static List<Tag> toTagList(List<TagDto> tagDtos) {
+    public static List<Tag> toTagList(Collection<TagDto> tagDtos) {
         TagDtoToTagConverter converter = new TagDtoToTagConverter();
         List<Tag> tags = new ArrayList<>();
         for (TagDto tagDto : tagDtos) {
@@ -31,7 +32,7 @@ public class TagDto extends RepresentationModel<TagDto> {
         return tags;
     }
 
-    public static List<TagDto> toTagDtoList(List<Tag> tags) {
+    public static List<TagDto> toTagDtoList(Collection<Tag> tags) {
         TagToTagDtoConverter converter = new TagToTagDtoConverter();
         List<TagDto> tagDtos = new ArrayList<>();
         for (Tag tag : tags) {

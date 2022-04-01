@@ -1,10 +1,12 @@
 package com.epam.esm.model.dto;
 
 import com.epam.esm.converter.UserToUserDtoConverter;
+import com.epam.esm.model.entity.Order;
 import com.epam.esm.model.entity.User;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,9 @@ public class UserDto extends RepresentationModel<UserDto> {
 
     String lastUpdateDate;
 
-    public static List<UserDto> toUserDtoList(List<User> users) {
+    List<OrderDto> orders;
+
+    public static List<UserDto> toUserDtoList(Collection<User> users) {
         UserToUserDtoConverter converter = new UserToUserDtoConverter();
         return users.stream()
                 .map(converter::convert)

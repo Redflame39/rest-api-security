@@ -5,6 +5,7 @@ import com.epam.esm.model.entity.Order;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class OrderDto extends RepresentationModel<OrderDto> {
 
     List<CertificateDto> certificates;
 
-    public static List<OrderDto> toOrderDtoList(List<Order> orders) {
+    public static List<OrderDto> toOrderDtoList(Collection<Order> orders) {
         OrderToOrderDtoConverter converter = new OrderToOrderDtoConverter();
         return orders.stream()
                 .map(converter::convert)

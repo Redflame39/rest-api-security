@@ -32,7 +32,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public List<UserDto> findAll(Long pageNum, Long pageSize) {
-        PageRequest pageRequest;
         Page<User> users = userRepository.findAll(PageRequest.of(pageNum.intValue(), pageSize.intValue()));
         return UserDto.toUserDtoList(users.toList());
     }

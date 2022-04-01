@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.hateoas.api.CertificateControllerHateoasLinkBuilder;
 import com.epam.esm.model.dto.CertificateDto;
 import com.epam.esm.model.dto.CertificateQueryDto;
 import com.epam.esm.model.dto.UpdatingCertificateDto;
@@ -24,6 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class CertificateController {
 
     private final CertificateService certificateService;
+    private final CertificateControllerHateoasLinkBuilder linkBuilder;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -38,87 +40,42 @@ public class CertificateController {
                                                         Long pageSize) {
         Long certificatesCount = certificateService.countCertificates();
         List<CertificateDto> certificateDtos = certificateService.findAll(certificatesQueryDto, pageNum, pageSize);
-        for (CertificateDto dto : certificateDtos) {
-            Link certificateLink = linkTo(methodOn(CertificateController.class).read(dto.getId())).withSelfRel();
-            dto.add(certificateLink);
-        }
-        List<Link> collectionLinks = new ArrayList<>();
-        if (pageNum != 0) {
-            Link prevPageLink = linkTo(methodOn(CertificateController.class)
-                    .read(certificatesQueryDto, pageNum - 1, pageSize))
-                    .withRel("Previous page");
-            collectionLinks.add(prevPageLink);
-        }
-        Link currentPageLink = linkTo(methodOn(CertificateController.class)
-                .read(certificatesQueryDto, pageNum, pageSize))
-                .withRel("Current page");
-        boolean isLastPage = pageNum * pageSize >= certificatesCount;
-        if (!isLastPage) {
-            Link nextPageLink = linkTo(methodOn(CertificateController.class)
-                    .read(certificatesQueryDto, pageNum + 1, pageSize))
-                    .withRel("Next page");
-            collectionLinks.add(nextPageLink);
-        }
-        collectionLinks.add(currentPageLink);
-        return CollectionModel.of(certificateDtos, collectionLinks);
+        return linkBuilder.buildReadAllLinks(certificateDtos, certificatesCount, pageNum, pageSize);
     }
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CertificateDto read(@PathVariable Long id) {
         CertificateDto dto = certificateService.findById(id);
-        Link self = linkTo(methodOn(CertificateController.class).read(id)).withSelfRel();
-        dto.add(self);
-        return dto;
+        return linkBuilder.buildReadSingleLinks(dto);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CertificateDto create(@RequestBody UpdatingCertificateDto certificate) {
         CertificateDto dto = certificateService.create(certificate);
-        Link self = linkTo(methodOn(CertificateController.class).create(certificate)).withSelfRel();
-        Link toCreatedLink = linkTo(methodOn(CertificateController.class)
-                .read(dto.getId()))
-                .withRel("Read created");
-        dto.add(self, toCreatedLink);
-        return dto;
+        return linkBuilder.buildCreateLinks(dto);
     }
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CertificateDto update(@PathVariable Long id, @RequestBody UpdatingCertificateDto certificateDto) {
         CertificateDto dto = certificateService.update(id, certificateDto);
-        Link self = linkTo(methodOn(CertificateController.class)
-                .update(id, certificateDto))
-                .withSelfRel();
-        Link toUpdatedLink = linkTo(methodOn(CertificateController.class)
-                .read(id))
-                .withRel("Read updated");
-        dto.add(self, toUpdatedLink);
-        return dto;
+        return linkBuilder.buildUpdateLinks(dto);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CertificateDto updatePrice(@PathVariable Long id, @RequestBody Double price) {
         CertificateDto dto = certificateService.updatePrice(id, price);
-        Link self = linkTo(methodOn(CertificateController.class).updatePrice(id, price)).withSelfRel();
-        Link toUpdatedLink = linkTo(methodOn(CertificateController.class)
-                .read(id))
-                .withRel("Read updated");
-        dto.add(self, toUpdatedLink);
-        return dto;
+        return linkBuilder.buildUpdatePriceLinks(dto);
     }
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CertificateDto delete(@PathVariable Long id) {
         CertificateDto dto = certificateService.delete(id);
-        Link self = linkTo(methodOn(CertificateController.class)
-                .delete(id))
-                .withSelfRel();
-        dto.add(self);
-        return dto;
+        return linkBuilder.buildDeleteLinks(dto);
     }
 
 }

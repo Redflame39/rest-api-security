@@ -1,5 +1,6 @@
 package com.epam.esm.converter;
 
+import com.epam.esm.model.dto.OrderDto;
 import com.epam.esm.model.dto.UserDto;
 import com.epam.esm.model.entity.User;
 import org.springframework.core.convert.converter.Converter;
@@ -22,6 +23,7 @@ public class UserToUserDtoConverter implements Converter<User, UserDto> {
         String updateDate = updateLocalDateTime.format(FORMATTER);
         userDto.setCreateDate(createDate);
         userDto.setLastUpdateDate(updateDate);
+        userDto.setOrders(OrderDto.toOrderDtoList(source.getOrders()));
         return userDto;
     }
 }
